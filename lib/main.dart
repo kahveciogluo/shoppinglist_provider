@@ -7,7 +7,7 @@ void main() {
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
       create: (_) => ProductNotifier(),
-    )
+    ),
   ], child: MyApp()));
 }
 

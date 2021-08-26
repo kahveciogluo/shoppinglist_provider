@@ -15,13 +15,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String? _name;
   String? _amount;
-  //List<Product> productList = [];
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    ProductNotifier productNotifier = Provider.of<ProductNotifier>(context);
     
     return Scaffold(
       appBar: AppBar(
@@ -31,6 +29,16 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(color: Colors.white, fontSize: 16.0),
           ),
         ),
+        actions: [
+          Center(
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                context.watch<ProductNotifier>().numberOfProducts.toString(),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Container(
         margin: EdgeInsets.all(20.0),
@@ -42,9 +50,9 @@ class _HomePageState extends State<HomePage> {
                 key: this._formKey,
                 child: ListView(
                   children: [
-                    BuildProductNameInput(),
+                    buildProductNameInput(),
                     SizedBox(height: 10.0),
-                    BuildProductAmountInput(),
+                    buildProductAmountInput(),
                   ],
                 ),
               ),
@@ -69,8 +77,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onPressed: () {
                     _formKey.currentState!.save();
-                    productNotifier.addProduct(Product(name: _name!, amount: _amount!));
-                    //addProduct(Product(name: _name!, amount: _amount!));
+                    context.read<ProductNotifier>().addProduct(Product(name: _name!, amount: _amount!));
                   },
                 ),
                 SizedBox(width: 10.0),
@@ -93,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ProductListScreen(productNotifier.productList))).then((value) => setState(() {productNotifier.productList;}));
+                            builder: (context) => ProductListScreen()));
                   },
                 ),
               ],
@@ -103,7 +110,7 @@ class _HomePageState extends State<HomePage> {
               child: ListView.builder(
                 shrinkWrap: true,
                   scrollDirection: Axis.vertical,
-                  itemCount: productNotifier.productList.length,
+                  itemCount: context.watch<ProductNotifier>().productList.length,
                 itemBuilder: (BuildContext context, int index) => Card(
                   color: Theme.of(context).primaryColor,
                   child: Padding(
@@ -114,18 +121,17 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Consumer<ProductNotifier>(builder: (_,notifier,__)=>Text(productNotifier.productList[index].name, style: TextStyle(color: Colors.white)),),
+                            Text(context.watch<ProductNotifier>().productList[index].name, style: TextStyle(color: Colors.white)),
                             SizedBox(width: 10.0),
-                            Consumer<ProductNotifier>(builder: (_,notifier,__)=>Text(productNotifier.productList[index].amount, style: TextStyle(color: Colors.white)),),
+                            Text(context.watch<ProductNotifier>().productList[index].amount, style: TextStyle(color: Colors.white)),
                           ],
                         ),
-                        Consumer<ProductNotifier>(builder: (_,notifier,__)=>IconButton(
-                          icon: Icon(Icons.delete, color: Colors.white,),
-                          onPressed: (){
-                            productNotifier.deleteProduct(index);
-                            //deleteProduct(index);
-                          },
-                        )),
+                      IconButton(
+                      icon: Icon(Icons.delete, color: Colors.white,),
+                      onPressed: (){
+                        context.read<ProductNotifier>().deleteProduct(index);
+                      },
+                    ),
                       ],
                     ),
                   ),
@@ -138,19 +144,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //addProduct(Product product) {
-    //setState(() {
-      //productList.add(product);
-    //});
-  //}
-
-  //deleteProduct(int index) {
-    //setState(() {
-      //productList.removeAt(index);
-    //});
-  //}
-
-  Widget BuildProductNameInput() {
+  Widget buildProductNameInput() {
     return TextFormField(
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(
@@ -175,7 +169,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget BuildProductAmountInput() {
+  Widget buildProductAmountInput() {
     return TextFormField(
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(

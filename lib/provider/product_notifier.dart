@@ -11,16 +11,14 @@ class ProductNotifier extends ChangeNotifier {
   
   addProduct(Product product){
     _productList.add(product);
+    _numberOfProducts++;
     notifyListeners();
   }
 
   deleteProduct(index){
     _productList.removeAt(index);
+    _numberOfProducts--;
     notifyListeners();
   }
 
-  incrementNumberOfProducts(){
-    _numberOfProducts++;
-    notifyListeners();
-  }
 }
